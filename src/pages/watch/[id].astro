@@ -10,8 +10,12 @@ export function getStaticPaths() {
 }
 const { id } = Astro.params;
 const v = JSON.parse(readFileSync(join(WDIR, `${id}.json`), "utf8"));
-// Media self-hosting fills in as the archive+CDN complete; until then Watch opens the official source.
-const archived = false; // flipped per-id once the file is on our CDN
+// media-manifest.json is written by the upload pipeline (id → {v,a}) as each file lands on the CDN.
+const MPATH = join(process.cwd(), "public", "data", "media-manifest.json");
+const manifest = existsSync(MPATH) ? JSON.parse(readFileSync(MPATH, "utf8")) : {};
+const media = manifest[id] || {};
+const CDN = "https://ravarush-media.nyc3.cdn.digitaloceanspaces.com";
+const hasVideo = !!media.v, hasAudio = !!media.a, archived = hasVideo || hasAudio;
 ---
 <Base title={v.title} description={`${v.title} — a shiur from Rabbi Shalom Arush.`}>
   <article class="reader"><div class="wrap">
@@ -20,18 +24,26 @@ const archived = false; // flipped per-id once the file is on our CDN
     <h1 dir={v.lang === "he" ? "rtl" : "ltr"}>{v.title}</h1>
     <p class="by">{v.date}</p>
 
+    {hasVideo && (
+      <video controls preload="metadata" style="width:100%;border-radius:14px;background:#000;margin-bottom:16px" src={`${CDN}/video/${id}.mp4`}></video>
+    )}
+    {!hasVideo && hasAudio && (
+      <audio controls preload="metadata" style="width:100%;margin-bottom:16px" src={`${CDN}/audio/${id}.mp3`}></audio>
+    )}
+
     <div class="transbar" style="flex-direction:column;align-items:stretch;gap:14px">
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between">
-        <span class="lbl">Watch &amp; listen</span>
+        <span class="lbl">Watch, listen &amp; download</span>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <a class="chip" href={v.source} rel="noopener" target="_blank">▶ Watch the shiur</a>
-          {archived
-            ? <><a class="chip" href={`https://media.ravarush.com/video/${v.id}.mp4`}>⬇ Video</a>
-                <a class="chip" href={`https://media.ravarush.com/audio/${v.id}.mp3`}>⬇ Audio</a></>
-            : <span class="chip" style="opacity:.6">⬇ Download — being prepared</span>}
+          {hasVideo && <a class="chip" href={`${CDN}/video/${id}.mp4`}>⬇ Video (MP4)</a>}
+          {hasAudio && <a class="chip" href={`${CDN}/audio/${id}.mp3`}>⬇ Audio (MP3)</a>}
+          <a class="chip" href={v.source} rel="noopener" target="_blank">▶ Watch on Breslev</a>
+          {!archived && <span class="chip" style="opacity:.6">⬇ Download — being prepared</span>}
         </div>
       </div>
-      <p class="muted" style="font-size:.85rem;margin:0">Every shiur is being archived in video and audio so you can download and keep it. Downloads open here as each finishes.</p>
+      <p class="muted" style="font-size:.85rem;margin:0">
+        {archived ? "Play it here, or download the video or audio to keep." : "Every shiur is being archived in video and audio to watch, stream, and download. This one opens here as soon as it finishes."}
+      </p>
     </div>
 
     <p class="muted" style="text-align:center;margin-top:26px">
