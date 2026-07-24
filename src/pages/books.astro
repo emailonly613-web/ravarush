@@ -1,0 +1,34 @@
+---
+import Base from "../layouts/Base.astro";
+// His sefarim — we link to the official Breslev store, we never sell.
+const books = [
+  { t:"The Garden of Emuna", d:"His signature — a practical guide to faith, sold in the millions.", u:"https://breslev.com/product/the-universal-garden-of-emuna/" },
+  { t:"The Universal Garden of Emuna", d:"Emuna for every person, in every walk of life.", u:"https://breslev.com/product/the-universal-garden-of-emuna/" },
+  { t:"The Garden of Peace", d:"The real man's guide to marriage — shalom bayis through emuna.", u:"https://breslev.com/store/" },
+  { t:"The Garden of Purity (Men)", d:"Guarding the covenant and the eyes, with compassion.", u:"https://breslev.com/product/the-garden-of-purity-for-men-only/" },
+  { t:"Women's Wisdom", d:"The garden of peace for the Jewish woman and home.", u:"https://breslev.com/store/" },
+  { t:"In Forest Fields", d:"A practical guide to personal prayer — hisbodedus.", u:"https://breslev.com/store/" },
+  { t:"The Garden of Gratitude", d:"Saying thank you — the key that opens every gate.", u:"https://breslev.com/store/" },
+  { t:"I'm In Your Hands", d:"Living with trust in the One who holds everything.", u:"https://breslev.com/product/im-in-your-hands/" },
+];
+---
+<Base title="Sefarim" description="The books of Rabbi Shalom Arush — the Garden of Emuna series and more — from the official Breslev store.">
+  <section class="section"><div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">His Sefarim</p>
+      <h2>The <span class="au">Garden</span> series, and more.</h2>
+      <p>His books have reached millions in a dozen languages. Each one below links straight to the official Breslev store — bring them home.</p>
+    </div>
+    <div class="halls">
+      {books.map((b)=>(
+        <a class="hall rv" href={b.u} rel="noopener">
+          <div class="n">Sefer</div>
+          <h3>{b.t}</h3>
+          <p>{b.d}</p>
+          <div class="go" style="margin-top:14px;color:var(--gold);font-weight:700">On Breslev →</div>
+        </a>
+      ))}
+    </div>
+    <p class="muted" style="text-align:center;margin-top:30px"><a href="https://breslev.com/store/" rel="noopener" style="color:var(--gold)">See the full store on Breslev.com →</a></p>
+  </div></section>
+</Base>

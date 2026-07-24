@@ -1,0 +1,16 @@
+{
+  "name": "rabbi-arush-hub",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "data": "node scripts/build-writings.mjs",
+    "build": "astro build",
+    "dev": "astro dev",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^5.6.1",
+    "@astrojs/sitemap": "^3.3.0",
+    "gsap": "^3.12.5"
+  }
+}

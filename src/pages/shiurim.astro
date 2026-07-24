@@ -1,0 +1,21 @@
+---
+import Base from "../layouts/Base.astro";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+const inv = new Array(JSON.parse(readFileSync(join(process.cwd(), "public", "data", "counts.json"), "utf8")).shiurim);
+---
+<Base title="Shiurim" description="The classes of Rabbi Shalom Arush, gathered from across the web — watch or listen, with transcripts where available.">
+  <section class="section"><div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">The Shiurim Wing</p>
+      <h2>{inv.length}+ classes, <span class="au">being set in order</span>.</h2>
+      <p>His shiurim are being gathered from every channel that carries them and archived in video, audio-only, and transcript form. This hall is furnished as each is downloaded — watch, listen, and read are on the way.</p>
+    </div>
+    <div class="halls">
+      <div class="hall"><div class="n">In progress</div><h3>Watch</h3><p>Every class in video, ≤1080p, on our own player — no outside feed.</p></div>
+      <div class="hall"><div class="n">In progress</div><h3>Listen</h3><p>Audio-only for the car, the walk, the kitchen — download or stream.</p></div>
+      <div class="hall"><div class="n">In progress</div><h3>Read</h3><p>Transcripts where available, with translation to English.</p></div>
+    </div>
+    <p class="muted" style="text-align:center;margin-top:30px">The archive is filling now. Meanwhile, his written Torah is fully open — <a href="/writings" style="color:var(--gold)">enter the writings →</a></p>
+  </div></section>
+</Base>

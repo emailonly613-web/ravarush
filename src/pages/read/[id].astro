@@ -1,0 +1,35 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+const READ = join(process.cwd(), "public", "data", "read");
+export function getStaticPaths() {
+  const dir = join(process.cwd(), "public", "data", "read");
+  return readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => ({ params: { id: f.replace(".json", "") } }));
+}
+const { id } = Astro.params;
+const a = JSON.parse(readFileSync(join(READ, `${id}.json`), "utf8"));
+const isHebrew = /[֐-׿]/.test(a.body.replace(/<[^>]+>/g, ""));
+---
+<Base title={a.title} description={`${a.title} — a teaching of Rabbi Shalom Arush on ${a.room || "emuna"}.`}>
+  <article class="reader"><div class="wrap">
+    <p class="crumbs"><a href="/writings">Writings</a> › <a href={`/writings/${a.hall}`}>{a.room || "Writings"}</a></p>
+    <p class="kicker">Rabbi Shalom Arush{a.room ? ` · ${a.room}` : ""}</p>
+    <h1>{a.title}</h1>
+    <p class="by">{a.date}{a.words ? ` · ${a.words} words` : ""}</p>
+
+    <div class="transbar">
+      <span class="lbl">Language</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="chip" aria-pressed="true">English</button>
+        <a class="chip" href={a.source} rel="noopener">View original on Breslev</a>
+      </div>
+    </div>
+
+    <div class="paper" dir={isHebrew ? "rtl" : "ltr"} set:html={a.body}></div>
+
+    <p class="muted" style="text-align:center;margin-top:26px">
+      From the teachings of HaRav Shalom Arush · <a href="/writings" style="color:var(--gold)">back to the writings</a>
+    </p>
+  </div></article>
+</Base>

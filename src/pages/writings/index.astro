@@ -1,0 +1,41 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+const w = JSON.parse(readFileSync(join(process.cwd(), "public", "data", "writings.json"), "utf8"));
+---
+<Base title="Writings" description="The written Torah of Rabbi Shalom Arush, set in order by theme — over a thousand articles across ten halls.">
+  <section class="section"><div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">The Writings Wing</p>
+      <h2>{w.total} writings, <span class="au">room by room</span>.</h2>
+      <p>His articles from the weekly Chut Shel Chessed newsletter and beyond — gathered and sorted into ten halls so you can walk straight to what your heart needs.</p>
+    </div>
+    <input class="search" id="q" placeholder="Search all writings…" autocomplete="off" />
+    <div class="halls" id="halls">
+      {w.halls.map((h)=>(
+        <a class="hall rv" href={`/writings/${h.slug}`} data-t={h.title.toLowerCase()}>
+          <div class="n">{h.count} articles</div>
+          <h3>{h.title}</h3>
+          <p>{h.blurb}</p>
+        </a>
+      ))}
+    </div>
+    <div id="results" class="rows" style="margin-top:20px"></div>
+  </div></section>
+  <script type="application/json" id="idx" set:html={JSON.stringify(
+    w.halls.flatMap(h=>h.articles.map(a=>({i:a.id,t:a.title,h:h.slug,r:a.room})))
+  )} />
+  <script is:inline>
+    const idx = JSON.parse(document.getElementById("idx").textContent);
+    const q=document.getElementById("q"), halls=document.getElementById("halls"), res=document.getElementById("results");
+    q.addEventListener("input",()=>{
+      const v=q.value.trim().toLowerCase();
+      if(v.length<2){halls.style.display="";res.innerHTML="";return}
+      halls.style.display="none";
+      const hits=idx.filter(a=>a.t.toLowerCase().includes(v)).slice(0,80);
+      res.innerHTML=hits.map(a=>`<a class="row" href="/read/${a.i}"><span class="t">${a.t}</span><span class="m">${a.r||""}</span></a>`).join("")
+        || `<p class="muted" style="text-align:center;padding:20px">No writing found for “${v}”.</p>`;
+    });
+  </script>
+</Base>

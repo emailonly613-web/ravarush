@@ -1,0 +1,79 @@
+---
+import "../styles/site.css";
+import { IDENTITY } from "../../data/arush.mjs";
+const { title, description, wide = false, noindex = false } = Astro.props;
+const pageTitle = title ? `${title} · Rabbi Shalom Arush` : "Rabbi Shalom Arush — The Garden of Emuna in English";
+const desc = description || IDENTITY.intro;
+const mark = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 6C26 18 14 20 14 34a18 18 0 0 0 36 0c0-14-12-16-18-28z' fill='none' stroke='%23e7c477' stroke-width='3'/%3E%3Cpath d='M32 30v22M32 40l-8-6M32 44l8-6' stroke='%23e7c477' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E`;
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{pageTitle}</title>
+<meta name="description" content={desc} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+<link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+<meta name="theme-color" content="#0b1220" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={desc} />
+<meta property="og:site_name" content="Rabbi Shalom Arush — English Hub" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href={mark} />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet" />
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context":"https://schema.org","@type":"Person","name":"Rabbi Shalom Arush",
+  "alternateName":["Rav Shalom Arush","HaRav Shalom Arush","שלום ארוש"],
+  "jobTitle":"Rosh Yeshiva, Chut Shel Chessed","description":desc,
+  "sameAs":Object.values(IDENTITY.socials)
+})} />
+</head>
+<body>
+<header class="hdr"><div class="wrap in">
+  <a class="brand" href="/"><img class="mk" src={mark} alt="" /><span><strong>Rabbi Shalom</strong> Arush</span></a>
+  <nav class="nav">
+    <a href="/shiurim">Shiurim</a>
+    <a href="/writings">Writings</a>
+    <a href="/books">Books</a>
+    <a href="/about">About</a>
+  </nav>
+</div></header>
+
+<main class={wide ? "" : ""}><slot /></main>
+
+<footer class="ftr"><div class="wrap">
+  <div class="cols">
+    <div style="max-width:320px">
+      <div class="brand" style="margin-bottom:10px"><img class="mk" src={mark} alt="" /><span>Rabbi Shalom Arush</span></div>
+      <p class="muted" style="font-size:.9rem">An English hub built by his students to spread the light of emuna, joy, and personal prayer.</p>
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:12px">Explore</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="/shiurim">Shiurim — watch & listen</a>
+        <a href="/writings">Writings</a>
+        <a href="/books">His sefarim</a>
+        <a href="/about">About the Rav</a>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:12px">Follow</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        {Object.entries(IDENTITY.socials).map(([k,v])=>(<a href={v} rel="noopener">{k}</a>))}
+      </div>
+    </div>
+  </div>
+  <p class="note">An unofficial English hub honoring the teachings of HaRav Shalom Arush shlit”a and Chut Shel Chessed, with links back to the official sources. All teachings © their authors and institutions.</p>
+</div></footer>
+
+<script>
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+  addEventListener("scroll",()=>document.querySelector(".hdr")?.classList.toggle("scrolled",scrollY>10));
+</script>
+</body>
+</html>
