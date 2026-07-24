@@ -21,7 +21,8 @@ const hasVideo = !!media.v, hasAudio = !!media.a, archived = hasVideo || hasAudi
   <article class="reader"><div class="wrap">
     <p class="crumbs"><a href="/shiurim">Shiurim</a>{v.series?.[0] ? ` › ${v.series[0]}` : ""}</p>
     <p class="kicker">Rabbi Shalom Arush · Shiur</p>
-    <h1 dir={v.lang === "he" ? "rtl" : "ltr"}>{v.title}</h1>
+    <h1>{v.title}</h1>
+    {v.titleHe && <p class="by" dir="rtl" style="font-size:1.1rem;color:var(--ink)">{v.titleHe}</p>}
     <p class="by">{v.date}</p>
 
     {hasVideo && (

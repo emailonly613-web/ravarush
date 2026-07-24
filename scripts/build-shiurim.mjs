@@ -6,11 +6,29 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 const DATA = "D:/arush-hub/data", OUT = "D:/arush-hub/site/public/data";
 mkdirSync(`${OUT}/watch`, { recursive: true });
+// English translations of Hebrew titles (the moat) — display English, keep Hebrew as secondary.
+const EN = existsSync(`${DATA}/titles-en.json`) ? JSON.parse(readFileSync(`${DATA}/titles-en.json`, "utf8")) : {};
+const heRe = /[֐-׿]/;
+const enTitle = (id, he) => EN[String(id)] || (heRe.test(he) ? he : he); // english if we have it
+// which ids have video on the CDN (for hover-to-play cards)
+const MAN = existsSync(`${OUT}/media-manifest.json`) ? JSON.parse(readFileSync(`${OUT}/media-manifest.json`, "utf8")) : {};
+const hasVid = (id) => Boolean(MAN[String(id)]?.v);
+const DUR = existsSync(`${DATA}/durations.json`) ? JSON.parse(readFileSync(`${DATA}/durations.json`, "utf8")) : {};
+
+const decode = (s) => String(s || "")
+  .replace(/&#8217;|&#8216;|&#039;|&#39;/g, "’").replace(/&#8220;|&#8221;|&quot;/g, "”")
+  .replace(/&#8211;|&#8212;|&ndash;|&mdash;/g, "—").replace(/&#160;|&nbsp;/g, " ")
+  .replace(/&#8230;|&hellip;/g, "…").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+  .replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 
 const vids = [];
 for (const f of ["breslev-video-he.json", "breslev-video-en.json"]) {
-  if (existsSync(`${DATA}/${f}`)) { try { vids.push(...JSON.parse(readFileSync(`${DATA}/${f}`, "utf8"))); } catch {} }
+  if (existsSync(`${DATA}/${f}`)) { try { for (const v of JSON.parse(readFileSync(`${DATA}/${f}`, "utf8"))) { v.title = decode(v.title); vids.push(v); } } catch {} }
 }
+// his OFFICIAL YouTube channel audios (reused from the D:\kolbo\arush stash) — keyed by YT id,
+// tagged into one room so they surface as playable/downloadable shiurim.
+const ytShiurim = [];
+if (existsSync(`${DATA}/yt-shiurim.json`)) { try { for (const v of JSON.parse(readFileSync(`${DATA}/yt-shiurim.json`, "utf8"))) { v.title = decode(v.title); v.officialChannel = true; ytShiurim.push(v); } } catch {} }
 // Hebrew category → English themed room (only the meaningful teaching topics; drop music/clips/jokes).
 const CAT_ROOM = {
   "יהדות והשקפה": "Emuna & Jewish Outlook", "אמונה": "Emuna & Jewish Outlook",
@@ -35,11 +53,13 @@ const rooms = new Map(); // title -> videos[]
 const put = (title, v) => { (rooms.get(title) || rooms.set(title, []).get(title)).push(v); };
 
 for (const v of vids) {
+  const te = enTitle(v.id, v.title);
+  const heSec = heRe.test(v.title) && te !== v.title ? v.title : "";
   writeFileSync(`${OUT}/watch/${v.id}.json`, JSON.stringify({
-    id: v.id, lang: v.lang, title: v.title, date: v.date, source: v.link,
+    id: v.id, lang: v.lang, title: te, titleHe: heSec, date: v.date, source: v.link,
     series: v.series || [], room: null,
   }));
-  const card = { id: v.id, title: v.title, date: v.date, lang: v.lang };
+  const card = { id: v.id, title: te, titleHe: heSec, date: v.date, lang: v.lang };
   // Named series = the best rooms.
   if (v.series && v.series.length) { put(`Series · ${v.series[0]}`, card); continue; }
   // else a themed topic room from category (skip music/clips/jokes).
@@ -48,9 +68,15 @@ for (const v of vids) {
   if ((v.categories || []).some((c) => DROP_CAT.has(c))) continue; // music/clips filtered out of shiurim
   put("More Shiurim", card);
 }
+// official-channel audios → their own room
+for (const v of ytShiurim) {
+  writeFileSync(`${OUT}/watch/${v.id}.json`, JSON.stringify({ id: v.id, lang: v.lang || "he", title: v.title,
+    date: v.date || "", source: v.link, series: [], room: "From His Official Channel" }));
+  put("From His Official Channel", { id: v.id, title: v.title, date: v.date || "", lang: v.lang || "he" });
+}
 
 // order: themed topic rooms first (bigger, curated), then series, then More.
-const THEMED = ["Emuna & Jewish Outlook","Breslev & Rebbe Nachman","Spirituality & Pnimiyus",
+const THEMED = ["From His Official Channel","Emuna & Jewish Outlook","Breslev & Rebbe Nachman","Spirituality & Pnimiyus",
   "The Weekly Parsha","The Jewish Year","Joy & Chizuk","Marriage & the Home","Tips for Living",
   "Questions & Answers","Israel & Society","Gemara & Halacha","Halacha","Shabbos","Tzaddikim",
   "For Women","For Children"];

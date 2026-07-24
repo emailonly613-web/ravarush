@@ -37,6 +37,16 @@ h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.1;margin:0}
 
 /* hero */
 .hero{position:relative;padding:clamp(64px,12vh,140px) 0 clamp(48px,8vh,90px);text-align:center;overflow:hidden}
+.hero--photo{min-height:min(88vh,760px);display:flex;align-items:center}
+.hero-photo{position:absolute;inset:0;background:url("/img/arush-2.jpg") center 22%/cover no-repeat;
+  transform:scale(1.05);animation:kenburns 26s ease-in-out infinite alternate;will-change:transform}
+@keyframes kenburns{from{transform:scale(1.05) translateY(0)}to{transform:scale(1.22) translateY(-1.5%)}}
+.hero-veil{position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(11,18,32,.62) 0%,rgba(11,18,32,.42) 38%,rgba(11,18,32,.82) 100%),
+  radial-gradient(1000px 520px at 50% 40%,transparent,rgba(11,18,32,.55))}
+@media(prefers-reduced-motion:reduce){.hero-photo{animation:none}}
+@media(max-width:640px){.hero-photo{background-position:center 14%}}
+.hero-haesh{display:block;margin:0 auto 18px;width:clamp(160px,22vw,240px);height:auto;filter:drop-shadow(0 6px 24px rgba(255,120,0,.4))}
 .hero h1{font-size:clamp(2.6rem,6.4vw,5rem);letter-spacing:-.01em}
 .hero .lede{max-width:720px;margin:22px auto 0;color:var(--muted);font-size:clamp(1.02rem,1.6vw,1.2rem)}
 .hero .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px}

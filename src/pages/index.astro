@@ -17,10 +17,13 @@ const wings = [
 ];
 ---
 <Base>
-  <section class="hero">
+  <section class="hero hero--photo">
+    <div class="hero-photo" aria-hidden="true"></div>
+    <div class="hero-veil" aria-hidden="true"></div>
     <div class="orbit" aria-hidden="true"></div>
-    <div class="wrap">
-      <p class="eyebrow rv">Chut Shel Chessed · in English</p>
+    <div class="wrap" style="position:relative;z-index:2">
+      <img class="hero-haesh rv" src="/haesh.svg" alt="האש שלי — My Fire" width="240" height="144" />
+      <p class="eyebrow rv">Rabbi Shalom Arush · Chut Shel Chessed · in English</p>
       <h1 class="rv">The <span class="au">Garden of Emuna</span>,<br/>opened for the world.</h1>
       <p class="lede rv">{IDENTITY.intro}</p>
       <div class="cta rv">

@@ -23,8 +23,8 @@ const s = existsSync(P) ? JSON.parse(readFileSync(P, "utf8")) : { rooms: [], tot
           </div>
           <div class="rows">
             {r.videos.slice(0,12).map((v)=>(
-              <a class="row" href={`/watch/${v.id}`} data-t={v.title.toLowerCase()} dir={v.lang==="he"?"rtl":"ltr"}>
-                <span class="t">{v.title}</span>
+              <a class="row" href={`/watch/${v.id}`} data-t={v.title.toLowerCase()}>
+                <span class="t">{v.title}{v.titleHe && <small style="display:block;color:var(--muted);font-size:.8rem" dir="rtl">{v.titleHe}</small>}</span>
                 <span class="m">{v.date}</span>
               </a>
             ))}
