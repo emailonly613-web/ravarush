@@ -14,24 +14,43 @@ const mark = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewB
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{pageTitle}</title>
 <meta name="description" content={desc} />
-{noindex && <meta name="robots" content="noindex, follow" />}
+{noindex ? <meta name="robots" content="noindex, follow" /> : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />}
 <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
 <meta name="theme-color" content="#0b1220" />
+<meta name="google-site-verification" content="QWT6Jxpk4s_lNAFruUu1YpS_8wBfJrPhygfLCvzl7Q0" />
+<meta name="keywords" content="Rabbi Shalom Arush, Rav Shalom Arush, Shalom Arush, HaRav Shalom Arush, הרב שלום ארוש, שלום ארוש, Garden of Emuna, The Garden of Emuna, Garden of Peace, In Forest Fields, Chut Shel Chessed, emuna, faith, Breslev, Breslov, Rebbe Nachman, hisbodedus, personal prayer, Jewish faith, Arush books, ספרי הרב שלום ארוש, גן האמונה, בגן האמונה, אמונה" />
+<meta name="author" content="Rabbi Shalom Arush" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content={pageTitle} />
 <meta property="og:description" content={desc} />
+<meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
 <meta property="og:site_name" content="Rabbi Shalom Arush — English Hub" />
+<meta property="og:image" content={new URL("/img/arush-2.jpg", Astro.site)} />
+<meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="he_IL" />
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={desc} />
+<meta name="twitter:image" content={new URL("/img/arush-2.jpg", Astro.site)} />
 <link rel="icon" href={mark} />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet" />
 <script type="application/ld+json" set:html={JSON.stringify({
   "@context":"https://schema.org","@type":"Person","name":"Rabbi Shalom Arush",
-  "alternateName":["Rav Shalom Arush","HaRav Shalom Arush","שלום ארוש"],
+  "alternateName":["Rav Shalom Arush","HaRav Shalom Arush","שלום ארוש","הרב שלום ארוש"],
   "jobTitle":"Rosh Yeshiva, Chut Shel Chessed","description":desc,
-  "sameAs":Object.values(IDENTITY.socials)
+  "affiliation":{"@type":"Organization","name":"Chut Shel Chessed"},
+  "knowsAbout":["Emuna","Faith","Breslev","Rebbe Nachman of Breslov","Personal prayer","Jewish spirituality"],
+  "sameAs":[...Object.values(IDENTITY.socials),"https://en.wikipedia.org/wiki/Shalom_Arush","https://breslev.com"]
 })} />
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context":"https://schema.org","@type":"WebSite","name":"Rabbi Shalom Arush — English Hub",
+  "url":"https://ravarush.com/","inLanguage":["en","he"],
+  "potentialAction":{"@type":"SearchAction","target":"https://ravarush.com/shiurim?q={q}","query-input":"required name=q"}
+})} />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LM479Y2LEC"></script>
+<script set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-LM479Y2LEC')`} />
 </head>
 <body>
 <header class="hdr"><div class="wrap in">
