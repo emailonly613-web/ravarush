@@ -1,0 +1,41 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { join } from "node:path";
+const WDIR = join(process.cwd(), "public", "data", "watch");
+export function getStaticPaths() {
+  const dir = join(process.cwd(), "public", "data", "watch");
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => ({ params: { id: f.replace(".json", "") } }));
+}
+const { id } = Astro.params;
+const v = JSON.parse(readFileSync(join(WDIR, `${id}.json`), "utf8"));
+// Media self-hosting fills in as the archive+CDN complete; until then Watch opens the official source.
+const archived = false; // flipped per-id once the file is on our CDN
+---
+<Base title={v.title} description={`${v.title} — a shiur from Rabbi Shalom Arush.`}>
+  <article class="reader"><div class="wrap">
+    <p class="crumbs"><a href="/shiurim">Shiurim</a>{v.series?.[0] ? ` › ${v.series[0]}` : ""}</p>
+    <p class="kicker">Rabbi Shalom Arush · Shiur</p>
+    <h1 dir={v.lang === "he" ? "rtl" : "ltr"}>{v.title}</h1>
+    <p class="by">{v.date}</p>
+
+    <div class="transbar" style="flex-direction:column;align-items:stretch;gap:14px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+        <span class="lbl">Watch &amp; listen</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a class="chip" href={v.source} rel="noopener" target="_blank">▶ Watch the shiur</a>
+          {archived
+            ? <><a class="chip" href={`https://media.ravarush.com/video/${v.id}.mp4`}>⬇ Video</a>
+                <a class="chip" href={`https://media.ravarush.com/audio/${v.id}.mp3`}>⬇ Audio</a></>
+            : <span class="chip" style="opacity:.6">⬇ Download — being prepared</span>}
+        </div>
+      </div>
+      <p class="muted" style="font-size:.85rem;margin:0">Every shiur is being archived in video and audio so you can download and keep it. Downloads open here as each finishes.</p>
+    </div>
+
+    <p class="muted" style="text-align:center;margin-top:26px">
+      From the shiurim of HaRav Shalom Arush · <a href="/shiurim" style="color:var(--gold)">back to the shiurim</a>
+    </p>
+  </div></article>
+</Base>

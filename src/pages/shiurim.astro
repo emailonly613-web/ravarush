@@ -1,21 +1,51 @@
 ---
 import Base from "../layouts/Base.astro";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-const inv = new Array(JSON.parse(readFileSync(join(process.cwd(), "public", "data", "counts.json"), "utf8")).shiurim);
+const P = join(process.cwd(), "public", "data", "shiurim.json");
+const s = existsSync(P) ? JSON.parse(readFileSync(P, "utf8")) : { rooms: [], total: 0 };
 ---
-<Base title="Shiurim" description="The classes of Rabbi Shalom Arush, gathered from across the web — watch or listen, with transcripts where available.">
+<Base title="Shiurim" description="The shiurim of Rabbi Shalom Arush — his classes gathered from his official sources, sorted into rooms by series and theme. Watch, listen, and download.">
   <section class="section"><div class="wrap">
     <div class="section-head rv">
       <p class="eyebrow">The Shiurim Wing</p>
-      <h2>{inv.length}+ classes, <span class="au">being set in order</span>.</h2>
-      <p>His shiurim are being gathered from every channel that carries them and archived in video, audio-only, and transcript form. This hall is furnished as each is downloaded — watch, listen, and read are on the way.</p>
+      <h2>{s.total} shiurim, <span class="au">room by room</span>.</h2>
+      <p>His classes — only his own — gathered from his official sources and set in order by series and theme. Watch or listen; audio and video downloads open as each is prepared.</p>
     </div>
-    <div class="halls">
-      <div class="hall"><div class="n">In progress</div><h3>Watch</h3><p>Every class in video, ≤1080p, on our own player — no outside feed.</p></div>
-      <div class="hall"><div class="n">In progress</div><h3>Listen</h3><p>Audio-only for the car, the walk, the kitchen — download or stream.</p></div>
-      <div class="hall"><div class="n">In progress</div><h3>Read</h3><p>Transcripts where available, with translation to English.</p></div>
+    {s.total === 0 && <p class="muted" style="text-align:center;padding:30px">The shiurim are being gathered and sorted now. Meanwhile, his written Torah is fully open — <a href="/writings" style="color:var(--gold)">enter the writings →</a></p>}
+    <input class="search" id="q" placeholder="Search all shiurim…" autocomplete="off" />
+    <div id="rooms">
+      {s.rooms.map((r)=>(
+        <section class="rv" style="margin-bottom:34px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+            <h3 style="font-family:var(--serif);font-size:1.5rem">{r.title}</h3>
+            <span class="muted" style="font-size:.85rem">{r.count} shiurim</span>
+          </div>
+          <div class="rows">
+            {r.videos.slice(0,12).map((v)=>(
+              <a class="row" href={`/watch/${v.id}`} data-t={v.title.toLowerCase()} dir={v.lang==="he"?"rtl":"ltr"}>
+                <span class="t">{v.title}</span>
+                <span class="m">{v.date}</span>
+              </a>
+            ))}
+          </div>
+          {r.count>12 && <p class="muted" style="font-size:.85rem;margin-top:6px">+{r.count-12} more in this room</p>}
+        </section>
+      ))}
     </div>
-    <p class="muted" style="text-align:center;margin-top:30px">The archive is filling now. Meanwhile, his written Torah is fully open — <a href="/writings" style="color:var(--gold)">enter the writings →</a></p>
+    <div id="results" class="rows" style="margin-top:12px"></div>
   </div></section>
+  <script type="application/json" id="idx" set:html={JSON.stringify(
+    s.rooms.flatMap(r=>r.videos.map(v=>({i:v.id,t:v.title,l:v.lang,d:v.date})))
+  )} />
+  <script is:inline>
+    const idx=JSON.parse(document.getElementById("idx").textContent);
+    const q=document.getElementById("q"),rooms=document.getElementById("rooms"),res=document.getElementById("results");
+    q.addEventListener("input",()=>{const v=q.value.trim().toLowerCase();
+      if(v.length<2){rooms.style.display="";res.innerHTML="";return}
+      rooms.style.display="none";
+      const hits=idx.filter(a=>a.t.toLowerCase().includes(v)).slice(0,100);
+      res.innerHTML=hits.map(a=>`<a class="row" href="/watch/${a.i}" dir="${a.l==='he'?'rtl':'ltr'}"><span class="t">${a.t}</span><span class="m">${a.d||""}</span></a>`).join("")||`<p class="muted" style="text-align:center;padding:20px">No shiur found.</p>`;
+    });
+  </script>
 </Base>
