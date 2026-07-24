@@ -8,10 +8,11 @@ const D = join(process.cwd(), "public", "data");
 const writings = JSON.parse(readFileSync(join(D, "writings.json"), "utf8"));
 const counts = JSON.parse(readFileSync(join(D, "counts.json"), "utf8"));
 const shiurim = counts.shiurim;
+const totalWritings = (counts.writings || 0) + (counts.writingsHe || 0);
 
 const wings = [
-  { n:"I", t:"Shiurim", d:"His classes, gathered from across the web — watch, or listen to audio only, with transcripts where available.", href:"/shiurim", stat:`${shiurim}+ classes` },
-  { n:"II", t:"Writings", d:"His written Torah, set in order by theme — the whole Garden of Emuna, room by room.", href:"/writings", stat:`${writings.total} articles` },
+  { n:"I", t:"Shiurim", d:"His classes, gathered from his official channels — watch, or listen to audio only, with transcripts where available.", href:"/shiurim", stat:`${shiurim}+ classes` },
+  { n:"II", t:"Writings", d:"His written Torah in English and Hebrew, set in order by theme — the whole Garden of Emuna, room by room.", href:"/writings", stat:`${totalWritings} articles` },
   { n:"III", t:"Sefarim", d:"His books — the Garden series and more — with the way to bring them home.", href:"/books", stat:"The Garden series" },
 ];
 ---
@@ -31,9 +32,9 @@ const wings = [
 
   <section class="wrap" style="padding-bottom:20px">
     <div class="ribbon rv">
-      <div class="stat"><b>{writings.total}</b><span>Writings</span></div>
+      <div class="stat"><b>{counts.writings}</b><span>English writings</span></div>
+      <div class="stat"><b>{counts.writingsHe}</b><span>Hebrew writings</span></div>
       <div class="stat"><b>{shiurim}+</b><span>Shiurim</span></div>
-      <div class="stat"><b>{writings.halls.length}</b><span>Halls</span></div>
       <div class="stat"><b>1</b><span>Living hub</span></div>
     </div>
   </section>

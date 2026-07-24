@@ -1,0 +1,37 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+const READ = join(process.cwd(), "public", "data", "read-he");
+export function getStaticPaths() {
+  const dir = join(process.cwd(), "public", "data", "read-he");
+  return readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => ({ params: { id: f.replace(".json", "") } }));
+}
+const { id } = Astro.params;
+const a = JSON.parse(readFileSync(join(READ, `${id}.json`), "utf8"));
+// Always-available translate-to-English (owner law): Google Translate of the original source page.
+const translateUrl = `https://translate.google.com/translate?sl=iw&tl=en&u=${encodeURIComponent(a.source || "")}`;
+---
+<Base title={a.title} description={`${a.title} — a Hebrew teaching of Rabbi Shalom Arush, with translation to English.`}>
+  <article class="reader"><div class="wrap">
+    <p class="crumbs"><a href="/writings-he">Hebrew Writings</a> › <a href={`/writings-he/${a.hall}`}>{a.hall}</a></p>
+    <p class="kicker">הרב שלום ארוש{a.room ? ` · ${a.room}` : ""}</p>
+    <h1 dir="rtl">{a.title}</h1>
+    <p class="by">{a.date}{a.words ? ` · ${a.words} מילים` : ""}</p>
+
+    <div class="transbar">
+      <span class="lbl">Language · שפה</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="chip" aria-pressed="true">עברית</button>
+        <a class="chip" href={translateUrl} rel="noopener" target="_blank">🌐 Translate to English</a>
+        <a class="chip" href={a.source} rel="noopener">Original on Breslev</a>
+      </div>
+    </div>
+
+    <div class="paper" dir="rtl" set:html={a.body}></div>
+
+    <p class="muted" style="text-align:center;margin-top:26px">
+      מתורתו של הרב שלום ארוש · <a href="/writings-he" style="color:var(--gold)">חזרה לכתבים</a>
+    </p>
+  </div></article>
+</Base>

@@ -1,0 +1,36 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+const w = JSON.parse(readFileSync(join(process.cwd(), "public", "data", "writings-he.json"), "utf8"));
+export function getStaticPaths() {
+  const wr = JSON.parse(readFileSync(join(process.cwd(), "public", "data", "writings-he.json"), "utf8"));
+  return wr.halls.map((h) => ({ params: { hall: h.slug } }));
+}
+const { hall } = Astro.params;
+const H = w.halls.find((h) => h.slug === hall);
+if (!H) return Astro.redirect("/writings-he");
+---
+<Base title={`${H.title} — Hebrew`} description={H.blurb}>
+  <section class="section"><div class="wrap">
+    <p class="crumbs"><a href="/writings-he">Hebrew Writings</a> › {H.title}</p>
+    <div class="section-head rv" style="text-align:left;margin-left:0">
+      <p class="eyebrow">{H.count} מאמרים</p>
+      <h2>{H.title}</h2>
+      <p>{H.blurb}</p>
+    </div>
+    <input class="search" id="q" placeholder="חיפוש…" autocomplete="off" dir="rtl" style="margin-left:0" />
+    <div class="rows" id="rows">
+      {H.articles.map((a)=>(
+        <a class="row rv" href={`/read-he/${a.id}`} dir="rtl" data-t={a.title}>
+          <span class="t">{a.title}</span>
+          <span class="m">{a.date}</span>
+        </a>
+      ))}
+    </div>
+  </div></section>
+  <script is:inline>
+    const q=document.getElementById("q"),rows=[...document.querySelectorAll("#rows .row")];
+    q.addEventListener("input",()=>{const v=q.value.trim();rows.forEach(r=>r.style.display=(!v||r.dataset.t.includes(v))?"":"none")});
+  </script>
+</Base>
