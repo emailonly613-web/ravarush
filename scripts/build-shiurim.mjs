@@ -115,6 +115,48 @@ for (const v of ytShiurim) {
   put("From His Official Channel", card);
 }
 
+// ⛔ NO DOUBLES (owner 2026-07-26: "i dont want doubles of everything, i just want
+// all his content ... thats it").
+//
+// ⚠ AND THE CORRECTION THAT MATTERS (owner, same day): "he only speaks in hebrew,
+// just sometimes it has english subtitles and sometimes not." THERE IS NO SEPARATE
+// ENGLISH BODY OF CONTENT. Every shiur is a Hebrew shiur; English is a SUBTITLE and
+// translation layer on top of it. Breslev's "English" site and his "English" channel
+// carry the SAME shiurim with subtitles — so a he/en split here would keep two copies
+// of one class, which IS the doubling he asked us to stop. The match is therefore
+// LANGUAGE-BLIND: one shiur, one entry.
+//
+// Keep the best copy: video beats audio-only, then the longer runtime, then the
+// earlier upload.
+{
+  const norm = (t) => String(t || "").toLowerCase()
+    .replace(/rabbi shalom arush|rav shalom arush|הרב שלום ארוש|הרב ארוש/g, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, " ").replace(/\s+/g, " ").trim();
+  const best = (a, b) => (b.v - a.v) || ((b.dur || 0) - (a.dur || 0)) || String(a.date || "9").localeCompare(String(b.date || "9"));
+  // ACROSS THE WHOLE CATALOGUE, not per room — the same shiur often lands in two
+  // different rooms (one copy categorised on Breslev's site, the other not), and a
+  // per-room pass leaves those standing.
+  const winner = new Map();                                    // key -> best card
+  for (const [, list] of rooms) for (const v of list) {
+    const n = norm(v.title);
+    if (n.length < 12) continue;                               // too short to match safely
+    const k = n;                                               // language-BLIND: one shiur, one entry
+    const cur = winner.get(k);
+    if (!cur || best(v, cur) < 0) winner.set(k, v);
+  }
+  const chosen = new Set([...winner.values()].map((v) => v.id));
+  let dropped = 0;
+  for (const [room, list] of rooms) {
+    rooms.set(room, list.filter((v) => {
+      const n = norm(v.title);
+      if (n.length < 12) return true;
+      if (chosen.has(v.id)) return true;
+      dropped++; return false;
+    }));
+  }
+  stats.doubles = dropped;
+}
+
 // order: themed topic rooms first (bigger, curated), then series, then More.
 const THEMED = ["From His Official Channel","Emuna & Jewish Outlook","Breslev & Rebbe Nachman","Spirituality & Pnimiyus",
   "The Weekly Parsha","The Jewish Year","Joy & Chizuk","Marriage & the Home","Tips for Living",
@@ -143,4 +185,5 @@ writeFileSync(`${OUT}/counts.json`, JSON.stringify(c));
 console.log(`shiurim OFFERED: ${out.total} (${out.video} to watch, ${out.audio} to listen) in ${out.rooms.length} rooms`);
 console.log(`  law refused    : ${JSON.stringify(stats.refused)}`);
 console.log(`  held back (no media on our CDN yet): ${stats.noMedia}`);
+  console.log(`  doubles merged : ${stats.doubles || 0}`);
 console.log(out.rooms.slice(0, 15).map((r) => `  ${String(r.count).padStart(4)} (${String(r.video).padStart(3)}v) ${r.title}`).join("\n"));
