@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { IDENTITY } from "../../data/arush.mjs";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
 const D = join(process.cwd(), "public", "data");
@@ -9,14 +9,33 @@ const writings = JSON.parse(readFileSync(join(D, "writings.json"), "utf8"));
 const counts = JSON.parse(readFileSync(join(D, "counts.json"), "utf8"));
 const shiurim = counts.shiurim;
 const totalWritings = (counts.writings || 0) + (counts.writingsHe || 0);
+const CDN = "https://ravarush-media.nyc3.cdn.digitaloceanspaces.com";
+
+// His shiurim come ONTO the front page — the owner found it "very dry and ugly"
+// with everything hidden a click away. Rooms with the most to watch lead.
+const S = existsSync(join(D, "shiurim.json")) ? JSON.parse(readFileSync(join(D, "shiurim.json"), "utf8")) : { rooms: [], total: 0, video: 0, audio: 0 };
+const sparks = existsSync(join(D, "sparks.json")) ? JSON.parse(readFileSync(join(D, "sparks.json"), "utf8")) : [];
+const sparkCount = Array.isArray(sparks) ? sparks.length : (sparks.items || []).length;
+
+const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const rowRooms = S.rooms.filter((r) => r.video > 0).slice(0, 4);
+// newest across everything we can actually play, for the opening shelf
+const newest = S.rooms.flatMap((r) => r.videos).filter((v) => v.v)
+  .sort((a, b) => (b.date || "").localeCompare(a.date || "")).slice(0, 14);
+// stills for the drifting marquee — real frames from real shiurim
+const stills = S.rooms.flatMap((r) => r.videos).filter((v) => v.v && v.t).slice(0, 40);
+const half = Math.ceil(stills.length / 2);
+
+const mmss = (d) => { if (!d) return ""; const h = Math.floor(d / 3600), m = Math.floor((d % 3600) / 60), x = d % 60;
+  return h ? `${h}:${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}` : `${m}:${String(x).padStart(2, "0")}`; };
 
 const wings = [
-  { n:"I", t:"Shiurim", d:"His classes, gathered from his official channels — watch, or listen to audio only, with transcripts where available.", href:"/shiurim", stat:`${shiurim}+ classes` },
+  { n:"I", t:"Shiurim", d:"His classes, gathered from his official sources — watch, or listen to audio only. Every one downloadable to keep.", href:"/shiurim", stat:`${shiurim} classes` },
   { n:"II", t:"Writings", d:"His written Torah in English and Hebrew, set in order by theme — the whole Garden of Emuna, room by room.", href:"/writings", stat:`${totalWritings} articles` },
   { n:"III", t:"Sefarim", d:"His books — the Garden series and more — with the way to bring them home.", href:"/books", stat:"The Garden series" },
 ];
 ---
-<Base>
+<Base dawn={true}>
   <section class="hero hero--photo">
     <div class="hero-photo" aria-hidden="true"></div>
     <div class="hero-veil" aria-hidden="true"></div>
@@ -26,21 +45,106 @@ const wings = [
       <h1 class="rv">The <span class="au">Garden of Emuna</span>,<br/>opened for the world.</h1>
       <p class="lede rv">{IDENTITY.intro}</p>
       <div class="cta rv">
-        <a class="btn btn-gold" href="/writings">Enter the writings</a>
-        <a class="btn btn-ghost" href="/shiurim">Watch his shiurim</a>
+        <a class="btn btn-gold" href="/shiurim">Watch his shiurim</a>
+        <a class="btn btn-ghost" href="/writings">Enter the writings</a>
       </div>
     </div>
   </section>
 
-  <section class="wrap" style="padding-bottom:20px">
+  <section class="wrap" style="padding-bottom:12px">
     <div class="ribbon rv">
-      <div class="stat"><b>{counts.writings}</b><span>English writings</span></div>
-      <div class="stat"><b>{counts.writingsHe}</b><span>Hebrew writings</span></div>
-      <div class="stat"><b>{shiurim}+</b><span>Shiurim</span></div>
-      <div class="stat"><b>1</b><span>Living hub</span></div>
+      <div class="stat"><b>{S.video || 0}</b><span>To watch</span></div>
+      <div class="stat"><b>{S.audio || 0}</b><span>To listen</span></div>
+      <div class="stat"><b>{totalWritings}</b><span>Writings</span></div>
+      <div class="stat"><b>{writings.halls.length}</b><span>Halls</span></div>
     </div>
   </section>
 
+  {stills.length > 8 && (
+    <section style="padding:6px 0 4px">
+      <div class="mq-wrap">
+        <div class="mq">
+          {[...stills.slice(0, half), ...stills.slice(0, half)].map((v) => (
+            <button class="mq-it" data-play={v.id} aria-label={v.title}><img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" /></button>
+          ))}
+        </div>
+      </div>
+      <div class="mq-wrap">
+        <div class="mq rev">
+          {[...stills.slice(half), ...stills.slice(half)].map((v) => (
+            <button class="mq-it" data-play={v.id} aria-label={v.title}><img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" /></button>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {newest.length > 0 && (
+    <section class="section" style="padding-top:26px"><div class="wrap">
+      <div class="section-head rv" style="margin-bottom:14px">
+        <p class="eyebrow">Straight from the beis medrash</p>
+        <h2>His newest <span class="au">shiurim</span>.</h2>
+        <p>Rest on any one and it begins to play. Every shiur here plays on this page and can be taken with you.</p>
+      </div>
+      <div class="row-scroll">
+        {newest.map((v) => (
+          <a class={`sc ${v.v ? "sv" : "sa"}`} href={`/watch/${v.id}`} data-id={v.id} data-v={v.v}>
+            <span class="sc-top">
+              <img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" onerror="this.remove()" />
+              <span class="sc-play">▸</span>
+              {v.dur > 0 && <span class="sc-dur">{mmss(v.dur)}</span>}
+            </span>
+            <span class="sc-b">
+              <span class="sc-t">{v.title}</span>
+              <span class="sc-m"><span class="sc-tag">Watch</span>{v.date && <span>{v.date}</span>}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div></section>
+  )}
+
+  {sparkCount > 0 && (
+    <section class="wrap" style="padding:10px 0 6px">
+      <div class="sparks-band rv">
+        <div class="sparks-in">
+          <div>
+            <p class="eyebrow">✦ Sparks</p>
+            <h3>A spark of his Torah, <span class="au">one after another</span>.</h3>
+            <p>{sparkCount} short shiurim, shortest first — swipe or tap through them full screen. A minute is enough to change a day.</p>
+          </div>
+          <a class="sparks-cta" href="/sparks">✦ Enter Sparks</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {rowRooms.map((r) => (
+    <section class="section" style="padding-top:22px"><div class="wrap">
+      <div class="row-head rv">
+        <h3>{r.title}</h3>
+        <a href={`/shiurim#${slug(r.title)}`}>{r.video} to watch{r.audio > 0 ? ` · ${r.audio} to listen` : ""} →</a>
+      </div>
+      <div class="row-scroll">
+        {r.videos.filter((v) => v.v).slice(0, 14).map((v) => (
+          <a class="sc sv" href={`/watch/${v.id}`} data-id={v.id} data-v="1">
+            <span class="sc-top">
+              <img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" onerror="this.remove()" />
+              <span class="sc-play">▸</span>
+              {v.dur > 0 && <span class="sc-dur">{mmss(v.dur)}</span>}
+            </span>
+            <span class="sc-b">
+              <span class="sc-t">{v.title}</span>
+              {v.titleHe && <small class="sc-he">{v.titleHe}</small>}
+              <span class="sc-m"><span class="sc-tag">Watch</span>{v.date && <span>{v.date}</span>}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div></section>
+  ))}
+
+  <div class="dawn">
   <section class="section"><div class="wrap">
     <div class="section-head rv">
       <p class="eyebrow">Three wings</p>
@@ -74,4 +178,14 @@ const wings = [
       ))}
     </div>
   </div></section>
+  </div>
+
+  <script is:inline src="/hover-play.js"></script>
+  <script is:inline>
+    // a still in the marquee is a doorway too — tap it and go straight to the shiur
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-play]"); if (!b) return;
+      location.href = "/watch/" + b.dataset.play;
+    });
+  </script>
 </Base>

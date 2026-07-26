@@ -39,14 +39,14 @@ h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.1;margin:0}
 /* hero */
 .hero{position:relative;padding:clamp(64px,12vh,140px) 0 clamp(48px,8vh,90px);text-align:center;overflow:hidden}
 .hero--photo{min-height:min(88vh,760px);display:flex;align-items:center}
-.hero-photo{position:absolute;inset:0;background:url("/img/arush-2.jpg") center 22%/cover no-repeat;
+.hero-photo{position:absolute;inset:0;background:url("/img/arush-hero.jpg") center 30%/cover no-repeat;
   transform:scale(1.05);animation:kenburns 26s ease-in-out infinite alternate;will-change:transform}
 @keyframes kenburns{from{transform:scale(1.05) translateY(0)}to{transform:scale(1.22) translateY(-1.5%)}}
 .hero-veil{position:absolute;inset:0;background:
-  linear-gradient(180deg,rgba(11,18,32,.62) 0%,rgba(11,18,32,.42) 38%,rgba(11,18,32,.82) 100%),
-  radial-gradient(1000px 520px at 50% 40%,transparent,rgba(11,18,32,.55))}
+  linear-gradient(180deg,rgba(11,18,32,.50) 0%,rgba(11,18,32,.26) 34%,rgba(11,18,32,.88) 100%),
+  radial-gradient(1100px 560px at 50% 42%,transparent,rgba(11,18,32,.42))}
 @media(prefers-reduced-motion:reduce){.hero-photo{animation:none}}
-@media(max-width:640px){.hero-photo{background-position:center 14%}}
+@media(max-width:640px){.hero-photo{background-position:center 26%}}
 .hero-haesh{display:block;margin:0 auto 16px;width:auto;height:clamp(112px,15vw,168px);
   filter:drop-shadow(0 10px 30px rgba(120,160,255,.34))}
 .hero h1{font-size:clamp(2.6rem,6.4vw,5rem);letter-spacing:-.01em}
@@ -188,3 +188,115 @@ h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.1;margin:0}
   background:transparent;border:1px solid var(--line);color:var(--gold);font-family:var(--sans);
   font-size:.9rem;letter-spacing:.04em;transition:border-color .3s,background .3s,transform .3s}
 .more-btn:hover{border-color:var(--gold);background:rgba(231,196,119,.07);transform:translateY(-1px)}
+
+/* ═══ HOMEPAGE: his shiurim ON the front page, not behind a link ═══════════════
+   (owner 2026-07-26: "i also want the videos organized on the front page not
+   hidden … the page is very dry and ugly") */
+
+/* horizontal room rows — a shelf you skim, like walking past a room's doorway */
+.row-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 10px}
+.row-head h3{font-family:var(--serif);font-size:1.5rem}
+.row-head a{color:var(--gold);font-size:.86rem;white-space:nowrap;opacity:.9}
+.row-head a:hover{opacity:1}
+.row-scroll{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(248px,268px);gap:18px;
+  overflow-x:auto;overflow-y:hidden;padding:4px 2px 18px;scroll-snap-type:x proximity;
+  scrollbar-width:thin;scrollbar-color:rgba(231,196,119,.35) transparent}
+.row-scroll>*{scroll-snap-align:start}
+.row-scroll::-webkit-scrollbar{height:8px}
+.row-scroll::-webkit-scrollbar-thumb{background:rgba(231,196,119,.3);border-radius:99px}
+.row-scroll::-webkit-scrollbar-track{background:transparent}
+
+/* moments marquee — two rows of real stills drifting in opposite directions */
+.mq-wrap{overflow:hidden;position:relative;margin:6px 0}
+.mq-wrap::before,.mq-wrap::after{content:"";position:absolute;top:0;bottom:0;width:12%;z-index:2;pointer-events:none}
+.mq-wrap::before{left:0;background:linear-gradient(90deg,var(--night),transparent)}
+.mq-wrap::after{right:0;background:linear-gradient(270deg,var(--night),transparent)}
+.mq{display:flex;gap:14px;width:max-content;animation:mqx 78s linear infinite}
+.mq.rev{animation-direction:reverse;animation-duration:94s}
+.mq-wrap:hover .mq{animation-play-state:paused}
+@keyframes mqx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mq-it{flex:none;width:190px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid var(--line);
+  background:#0b1220;cursor:pointer;padding:0;transition:transform .4s,border-color .4s}
+.mq-it img{width:100%;height:100%;object-fit:cover;object-position:center 52%;opacity:.78;transition:opacity .4s,transform .8s}
+.mq-it:hover{transform:translateY(-3px);border-color:rgba(231,196,119,.45)}
+.mq-it:hover img{opacity:1;transform:scale(1.05)}
+@media(prefers-reduced-motion:reduce){.mq{animation:none}}
+
+/* Sparks band — the short-shiur feed, given its own doorway */
+.sparks-band{position:relative;overflow:hidden;border-radius:var(--r);margin:8px 0 6px;
+  border:1px solid rgba(231,196,119,.28);
+  background:radial-gradient(900px 300px at 18% 0%,rgba(231,196,119,.16),transparent 62%),
+             linear-gradient(120deg,#14213e,#0b1220 70%)}
+.sparks-band::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:radial-gradient(2px 2px at 12% 30%,rgba(231,196,119,.7),transparent),
+             radial-gradient(2px 2px at 34% 68%,rgba(231,196,119,.5),transparent),
+             radial-gradient(2px 2px at 61% 24%,rgba(255,255,255,.5),transparent),
+             radial-gradient(2px 2px at 79% 60%,rgba(231,196,119,.6),transparent),
+             radial-gradient(2px 2px at 91% 36%,rgba(255,255,255,.4),transparent);
+  animation:twinkle 4.5s ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.28}to{opacity:.72}}
+.sparks-in{position:relative;z-index:2;display:flex;align-items:center;gap:26px;flex-wrap:wrap;
+  justify-content:space-between;padding:clamp(22px,3.4vw,38px)}
+.sparks-in h3{font-family:var(--serif);font-size:clamp(1.7rem,3.2vw,2.5rem);margin-bottom:6px}
+.sparks-in p{color:var(--muted);max-width:52ch;margin:0}
+.sparks-cta{display:inline-flex;align-items:center;gap:9px;padding:13px 26px;border-radius:999px;
+  background:linear-gradient(100deg,var(--gold),#f4e2b4 60%,var(--gold-2));color:#231a06;font-weight:700;
+  white-space:nowrap;transition:transform .3s,box-shadow .3s}
+.sparks-cta:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(231,196,119,.28)}
+@media(prefers-reduced-motion:reduce){.sparks-band::after{animation:none}}
+
+/* ═══ THE DAWN ZONE — the page lightens as you go down ════════════════════════
+   Owner 2026-07-26: "too much blue … the second half down should be a bit lighter
+   maybe a contrast of a white a little bit to bring up the peaceful vibe."
+   The top of the page stays night — video reads best on dark, and the hero is his
+   photo. From the wings down it opens into warm parchment: the writings half of
+   the castle, lit like morning. Parchment, never clinical white — this is a page
+   about sefarim.
+   Done by REDEFINING THE TOKENS inside .dawn, so every existing component
+   (.wing/.hall/.section-head/.ftr/.eyebrow) adapts on its own with no rule
+   duplication and no risk of missing one. */
+.dawn{
+  --ink:#1f2637; --muted:#5b6478;
+  --night:#faf7f0; --night-2:#ffffff;
+  --line:rgba(31,38,55,.13);
+  --gold:#9a7423; --gold-2:#7d5c16;
+  position:relative; color:var(--ink);
+  background:linear-gradient(180deg,
+    #0b1220 0,
+    #2a3350 4%,
+    #8e9099 9%,
+    #e7e2d6 15%,
+    #faf7f0 30%,
+    #fffdf8 62%,
+    #f3eee2 100%);
+}
+/* a soft dawn glow where the night gives way */
+.dawn::before{content:"";position:absolute;left:0;right:0;top:0;height:38vh;pointer-events:none;
+  background:radial-gradient(1200px 320px at 50% 8%,rgba(231,196,119,.30),transparent 70%)}
+.dawn>*{position:relative;z-index:1}
+
+.dawn .au{background:linear-gradient(100deg,#8a6413,#c39a3e 55%,#6f5210);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.dawn .eyebrow{color:#8a6413}
+.dawn .wing{background:linear-gradient(180deg,#ffffff,#fbf8f1);
+  border-color:rgba(31,38,55,.12);box-shadow:0 10px 30px rgba(31,38,55,.07)}
+.dawn .wing:hover{border-color:rgba(154,116,35,.5);box-shadow:0 26px 60px rgba(31,38,55,.14)}
+.dawn .wing::after{background:radial-gradient(circle,rgba(154,116,35,.10),transparent 70%)}
+.dawn .hall{background:#ffffff;border-color:rgba(31,38,55,.12);box-shadow:0 8px 22px rgba(31,38,55,.06)}
+.dawn .hall:hover{border-color:rgba(154,116,35,.45);box-shadow:0 20px 44px rgba(31,38,55,.12)}
+.dawn .ftr{border-top:1px solid rgba(31,38,55,.12);background:transparent}
+.dawn .ftr a{color:var(--ink);opacity:.82}
+.dawn .ftr a:hover{color:var(--gold-2);opacity:1}
+/* the emblem is a light mark made for dark cloth — give it a hairline plate on parchment */
+.dawn .brand .mk{background:radial-gradient(circle at 50% 45%,#1a2438,#0d1424);
+  border-radius:50%;padding:4px;box-shadow:0 2px 10px rgba(31,38,55,.18)}
+/* the footer continues the dawn rather than snapping back to night */
+.ftr--dawn{--ink:#1f2637;--muted:#5b6478;--gold:#9a7423;--gold-2:#7d5c16;
+  color:#1f2637;background:linear-gradient(180deg,#f3eee2,#ece5d6);
+  margin-top:0;padding-top:60px;border-top:1px solid rgba(31,38,55,.12)}
+.ftr--dawn a{color:#1f2637;opacity:.82}
+.ftr--dawn a:hover{color:#7d5c16;opacity:1}
+.ftr--dawn .eyebrow{color:#8a6413}
+.ftr--dawn .muted{color:#5b6478}
+.ftr--dawn .brand .mk{background:radial-gradient(circle at 50% 45%,#1a2438,#0d1424);
+  border-radius:50%;padding:4px;box-shadow:0 2px 10px rgba(31,38,55,.18)}

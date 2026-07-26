@@ -8,6 +8,7 @@ const CDN = "https://ravarush-media.nyc3.cdn.digitaloceanspaces.com";
 const mmss = (d) => { if (!d) return ""; const h = Math.floor(d / 3600), m = Math.floor((d % 3600) / 60), x = d % 60;
   return h ? `${h}:${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}` : `${m}:${String(x).padStart(2, "0")}`; };
 const PER = 12;
+const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 ---
 <Base title="Shiurim" description="The shiurim of Rabbi Shalom Arush — his own classes, gathered from his official sources and set in order room by room. Watch, listen, and download.">
   <section class="section"><div class="wrap">
@@ -28,7 +29,7 @@ const PER = 12;
 
     <div id="rooms">
       {s.rooms.map((r) => (
-        <section class="rv" style="margin-bottom:42px">
+        <section class="rv" id={slug(r.title)} style="margin-bottom:42px;scroll-margin-top:90px">
           <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:4px">
             <h3 style="font-family:var(--serif);font-size:1.55rem">{r.title}</h3>
             <span class="muted" style="font-size:.84rem;white-space:nowrap">
@@ -106,47 +107,6 @@ const PER = 12;
       b.remove();
     });
 
-    // ── HOVER PREVIEW: rest on a shiur and it begins to play, silently, in place.
-    // Desktop pointers only (a phone cannot hover and must not pay for the data),
-    // off under reduced-motion, one at a time, after a dwell so sweeping the grid
-    // doesn't spawn a dozen videos. Only cards we hold video for (data-v="1").
-    (function () {
-      if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      const DWELL = 380;
-      let timer = null, host = null, vid = null;
-      function stop() {
-        clearTimeout(timer); timer = null;
-        if (vid) { try { vid.pause(); vid.removeAttribute("src"); vid.load(); } catch (e) {} vid.remove(); vid = null; }
-        if (host) { host.classList.remove("previewing"); host = null; }
-      }
-      function start(el, id) {
-        stop(); host = el;
-        const top = el.querySelector(".sc-top") || el;
-        const v = document.createElement("video");
-        v.className = "sc-prev";
-        v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = true;
-        v.preload = "auto"; v.setAttribute("aria-hidden", "true"); v.tabIndex = -1;
-        v.src = `${CDN}/video/${id}.mp4`;
-        vid = v;
-        v.addEventListener("loadeddata", () => { if (vid === v && host === el) { v.classList.add("on"); el.classList.add("previewing"); } }, { once: true });
-        v.addEventListener("error", () => { if (vid === v) stop(); }, { once: true });
-        top.appendChild(v);
-        const p = v.play(); if (p && p.catch) p.catch(() => { if (vid === v) stop(); });
-      }
-      document.addEventListener("pointerover", (e) => {
-        if (e.pointerType && e.pointerType !== "mouse") return;
-        const el = e.target.closest(".sc"); if (!el || el === host) return;
-        if (el.dataset.v !== "1") return stop();
-        stop(); timer = setTimeout(() => start(el, el.dataset.id), DWELL);
-      });
-      document.addEventListener("pointerout", (e) => {
-        if (!host) return;
-        const to = e.relatedTarget; if (to && host.contains(to)) return;
-        stop();
-      });
-      addEventListener("scroll", () => { if (host && !host.isConnected) stop(); }, { passive: true });
-      addEventListener("blur", stop);
-    })();
   </script>
+  <script is:inline src="/hover-play.js"></script>
 </Base>

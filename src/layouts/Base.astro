@@ -1,7 +1,7 @@
 ---
 import "../styles/site.css";
 import { IDENTITY } from "../../data/arush.mjs";
-const { title, description, wide = false, noindex = false } = Astro.props;
+const { title, description, wide = false, noindex = false, dawn = false } = Astro.props;
 const pageTitle = title ? `${title} · Rabbi Shalom Arush` : "Rabbi Shalom Arush — The Garden of Emuna in English";
 const desc = description || IDENTITY.intro;
 // Haesh Sheli — a real fire flame (owner: no olive-leaf; the famous "my fire" symbol).
@@ -28,13 +28,13 @@ const mark = "/img/haesh-logo.png";
 <meta property="og:description" content={desc} />
 <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
 <meta property="og:site_name" content="Rabbi Shalom Arush — English Hub" />
-<meta property="og:image" content={new URL("/img/arush-2.jpg", Astro.site)} />
+<meta property="og:image" content={new URL("/img/arush-hero.jpg", Astro.site)} />
 <meta property="og:locale" content="en_US" />
 <meta property="og:locale:alternate" content="he_IL" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={pageTitle} />
 <meta name="twitter:description" content={desc} />
-<meta name="twitter:image" content={new URL("/img/arush-2.jpg", Astro.site)} />
+<meta name="twitter:image" content={new URL("/img/arush-hero.jpg", Astro.site)} />
 <link rel="icon" href="/img/favicon-32.png" sizes="32x32" />
 <link rel="icon" href="/img/icon-192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
@@ -72,7 +72,7 @@ const mark = "/img/haesh-logo.png";
 
 <main class={wide ? "" : ""}><slot /></main>
 
-<footer class="ftr"><div class="wrap">
+<footer class={dawn ? "ftr ftr--dawn" : "ftr"}><div class="wrap">
   <div class="cols">
     <div style="max-width:320px">
       <div class="brand" style="margin-bottom:10px"><img class="mk" src={mark} alt="" /><span>Rabbi Shalom Arush</span></div>
