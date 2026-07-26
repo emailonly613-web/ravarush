@@ -3,49 +3,150 @@ import Base from "../layouts/Base.astro";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 const P = join(process.cwd(), "public", "data", "shiurim.json");
-const s = existsSync(P) ? JSON.parse(readFileSync(P, "utf8")) : { rooms: [], total: 0 };
+const s = existsSync(P) ? JSON.parse(readFileSync(P, "utf8")) : { rooms: [], total: 0, video: 0, audio: 0 };
+const CDN = "https://ravarush-media.nyc3.cdn.digitaloceanspaces.com";
+const mmss = (d) => { if (!d) return ""; const h = Math.floor(d / 3600), m = Math.floor((d % 3600) / 60), x = d % 60;
+  return h ? `${h}:${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}` : `${m}:${String(x).padStart(2, "0")}`; };
+const PER = 12;
 ---
-<Base title="Shiurim" description="The shiurim of Rabbi Shalom Arush — his classes gathered from his official sources, sorted into rooms by series and theme. Watch, listen, and download.">
+<Base title="Shiurim" description="The shiurim of Rabbi Shalom Arush — his own classes, gathered from his official sources and set in order room by room. Watch, listen, and download.">
   <section class="section"><div class="wrap">
     <div class="section-head rv">
       <p class="eyebrow">The Shiurim Wing</p>
       <h2>{s.total} shiurim, <span class="au">room by room</span>.</h2>
-      <p>His classes — only his own — gathered from his official sources and set in order by series and theme. Watch or listen; audio and video downloads open as each is prepared.</p>
+      <p>
+        His classes — only his own — gathered from his official sources and set in order by theme and series.
+        {s.video > 0 && <> <b style="color:var(--gold)">{s.video} to watch</b> ·</>}
+        {s.audio > 0 && <> <b style="color:var(--gold)">{s.audio} to listen</b>.</>}
+        Every one plays here, and every one can be downloaded to keep.
+      </p>
     </div>
-    {s.total === 0 && <p class="muted" style="text-align:center;padding:30px">The shiurim are being gathered and sorted now. Meanwhile, his written Torah is fully open — <a href="/writings" style="color:var(--gold)">enter the writings →</a></p>}
+
+    {s.total === 0 && <p class="muted" style="text-align:center;padding:30px">The shiurim are being gathered and sorted now. Meanwhile his written Torah is fully open — <a href="/writings" style="color:var(--gold)">enter the writings →</a></p>}
+
     <input class="search" id="q" placeholder="Search all shiurim…" autocomplete="off" />
+
     <div id="rooms">
-      {s.rooms.map((r)=>(
-        <section class="rv" style="margin-bottom:34px">
-          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
-            <h3 style="font-family:var(--serif);font-size:1.5rem">{r.title}</h3>
-            <span class="muted" style="font-size:.85rem">{r.count} shiurim</span>
+      {s.rooms.map((r) => (
+        <section class="rv" style="margin-bottom:42px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:4px">
+            <h3 style="font-family:var(--serif);font-size:1.55rem">{r.title}</h3>
+            <span class="muted" style="font-size:.84rem;white-space:nowrap">
+              {r.video > 0 && <>{r.video} to watch</>}{r.video > 0 && r.audio > 0 && <> · </>}{r.audio > 0 && <>{r.audio} to listen</>}
+            </span>
           </div>
-          <div class="rows">
-            {r.videos.slice(0,12).map((v)=>(
-              <a class="row" href={`/watch/${v.id}`} data-t={v.title.toLowerCase()}>
-                <span class="t">{v.title}{v.titleHe && <small style="display:block;color:var(--muted);font-size:.8rem" dir="rtl">{v.titleHe}</small>}</span>
-                <span class="m">{v.date}</span>
+          <div class="sgrid" data-room={r.title}>
+            {r.videos.slice(0, PER).map((v) => (
+              <a class={`sc ${v.v ? "sv" : "sa"}`} href={`/watch/${v.id}`} data-id={v.id} data-v={v.v} data-t={v.title.toLowerCase()}>
+                <span class="sc-top">
+                  {v.v && v.t
+                    ? <img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" />
+                    : v.v
+                      ? <img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" onerror="this.remove()" />
+                      : <span class="sa-ic">♪</span>}
+                  <span class="sc-play">{v.v ? "▸" : "♪"}</span>
+                  {v.dur > 0 && <span class="sc-dur">{mmss(v.dur)}</span>}
+                </span>
+                <span class="sc-b">
+                  <span class="sc-t">{v.title}</span>
+                  {v.titleHe && <small class="sc-he">{v.titleHe}</small>}
+                  <span class="sc-m">
+                    <span class="sc-tag">{v.v ? "Watch" : "Listen"}</span>
+                    {v.date && <span>{v.date}</span>}
+                  </span>
+                </span>
               </a>
             ))}
           </div>
-          {r.count>12 && <p class="muted" style="font-size:.85rem;margin-top:6px">+{r.count-12} more in this room</p>}
+          {r.count > PER && (
+            <button class="more-btn" data-more={r.title} style="margin-top:14px">Show all {r.count} in this room</button>
+          )}
         </section>
       ))}
     </div>
-    <div id="results" class="rows" style="margin-top:12px"></div>
+
+    <div id="results" class="sgrid" style="margin-top:12px"></div>
   </div></section>
+
   <script type="application/json" id="idx" set:html={JSON.stringify(
-    s.rooms.flatMap(r=>r.videos.map(v=>({i:v.id,t:v.title,l:v.lang,d:v.date})))
+    s.rooms.flatMap((r) => r.videos.map((v) => ({ i: v.id, t: v.title, h: v.titleHe || "", l: v.lang, d: v.date, v: v.v, u: v.dur, r: r.title })))
   )} />
-  <script is:inline>
-    const idx=JSON.parse(document.getElementById("idx").textContent);
-    const q=document.getElementById("q"),rooms=document.getElementById("rooms"),res=document.getElementById("results");
-    q.addEventListener("input",()=>{const v=q.value.trim().toLowerCase();
-      if(v.length<2){rooms.style.display="";res.innerHTML="";return}
-      rooms.style.display="none";
-      const hits=idx.filter(a=>a.t.toLowerCase().includes(v)).slice(0,100);
-      res.innerHTML=hits.map(a=>`<a class="row" href="/watch/${a.i}" dir="${a.l==='he'?'rtl':'ltr'}"><span class="t">${a.t}</span><span class="m">${a.d||""}</span></a>`).join("")||`<p class="muted" style="text-align:center;padding:20px">No shiur found.</p>`;
+
+  <script is:inline define:vars={{ CDN, PER }}>
+    const idx = JSON.parse(document.getElementById("idx").textContent);
+    const q = document.getElementById("q"), rooms = document.getElementById("rooms"), res = document.getElementById("results");
+    const esc = (s) => String(s || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const mmss = (d) => { if (!d) return ""; const h = Math.floor(d / 3600), m = Math.floor((d % 3600) / 60), x = d % 60;
+      return h ? `${h}:${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}` : `${m}:${String(x).padStart(2, "0")}`; };
+
+    const card = (a) => `<a class="sc ${a.v ? "sv" : "sa"}" href="/watch/${a.i}" data-id="${a.i}" data-v="${a.v}">`
+      + `<span class="sc-top">${a.v ? `<img src="${CDN}/thumb/${a.i}.jpg" alt="" loading="lazy" onerror="this.remove()">` : `<span class="sa-ic">♪</span>`}`
+      + `<span class="sc-play">${a.v ? "▸" : "♪"}</span>${a.u ? `<span class="sc-dur">${mmss(a.u)}</span>` : ""}</span>`
+      + `<span class="sc-b"><span class="sc-t">${esc(a.t)}</span>${a.h ? `<small class="sc-he">${esc(a.h)}</small>` : ""}`
+      + `<span class="sc-m"><span class="sc-tag">${a.v ? "Watch" : "Listen"}</span>${a.d ? `<span>${esc(a.d)}</span>` : ""}</span></span></a>`;
+
+    // search across everything offered
+    q.addEventListener("input", () => {
+      const v = q.value.trim().toLowerCase();
+      if (v.length < 2) { rooms.style.display = ""; res.innerHTML = ""; return; }
+      rooms.style.display = "none";
+      const hits = idx.filter((a) => a.t.toLowerCase().includes(v) || (a.h && a.h.includes(v))).slice(0, 120);
+      res.innerHTML = hits.length ? hits.map(card).join("")
+        : `<p class="muted" style="text-align:center;padding:20px;grid-column:1/-1">No shiur found.</p>`;
     });
+
+    // "show all in this room" — expand without leaving the page
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-more]"); if (!b) return;
+      e.preventDefault();
+      const room = b.dataset.more;
+      const grid = document.querySelector(`.sgrid[data-room="${CSS.escape(room)}"]`);
+      if (!grid) return;
+      grid.insertAdjacentHTML("beforeend", idx.filter((a) => a.r === room).slice(PER).map(card).join(""));
+      b.remove();
+    });
+
+    // ── HOVER PREVIEW: rest on a shiur and it begins to play, silently, in place.
+    // Desktop pointers only (a phone cannot hover and must not pay for the data),
+    // off under reduced-motion, one at a time, after a dwell so sweeping the grid
+    // doesn't spawn a dozen videos. Only cards we hold video for (data-v="1").
+    (function () {
+      if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const DWELL = 380;
+      let timer = null, host = null, vid = null;
+      function stop() {
+        clearTimeout(timer); timer = null;
+        if (vid) { try { vid.pause(); vid.removeAttribute("src"); vid.load(); } catch (e) {} vid.remove(); vid = null; }
+        if (host) { host.classList.remove("previewing"); host = null; }
+      }
+      function start(el, id) {
+        stop(); host = el;
+        const top = el.querySelector(".sc-top") || el;
+        const v = document.createElement("video");
+        v.className = "sc-prev";
+        v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = true;
+        v.preload = "auto"; v.setAttribute("aria-hidden", "true"); v.tabIndex = -1;
+        v.src = `${CDN}/video/${id}.mp4`;
+        vid = v;
+        v.addEventListener("loadeddata", () => { if (vid === v && host === el) { v.classList.add("on"); el.classList.add("previewing"); } }, { once: true });
+        v.addEventListener("error", () => { if (vid === v) stop(); }, { once: true });
+        top.appendChild(v);
+        const p = v.play(); if (p && p.catch) p.catch(() => { if (vid === v) stop(); });
+      }
+      document.addEventListener("pointerover", (e) => {
+        if (e.pointerType && e.pointerType !== "mouse") return;
+        const el = e.target.closest(".sc"); if (!el || el === host) return;
+        if (el.dataset.v !== "1") return stop();
+        stop(); timer = setTimeout(() => start(el, el.dataset.id), DWELL);
+      });
+      document.addEventListener("pointerout", (e) => {
+        if (!host) return;
+        const to = e.relatedTarget; if (to && host.contains(to)) return;
+        stop();
+      });
+      addEventListener("scroll", () => { if (host && !host.isConnected) stop(); }, { passive: true });
+      addEventListener("blur", stop);
+    })();
   </script>
 </Base>

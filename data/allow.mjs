@@ -48,3 +48,23 @@ export function ytAllowed(channelId, title = "", channel = "") {
   const s = `${title} ${channel}`;
   return !NOT_HIM.some((re) => re.test(s));
 }
+
+// 5) NOT A SHIUR — even his own official channel posts things that are not him
+// teaching: songs and musical performances (often fronted by a named singer),
+// clips, trailers, promos. The Shiurim wing is his TORAH, not his channel's feed.
+// Caught live 2026-07-26: "אהבת חינם I בביצוע מרגש ביותר שוקי סלומון והרב שלום ארוש"
+// (a song PERFORMED BY Shuki Salomon with him) was sitting in the shiurim catalog.
+export const NOT_A_SHIUR = [
+  /בביצוע|הזמר|קליפ|שיר חדש|ניגון|מארח|דואט|הופעה|מופע/,          // HE: performed-by / singer / clip / song
+  /\bfeat\.?\b|\bft\.?\b|official (video|clip|music)|music video|\bsong\b|\bniggun\b|\btrailer\b|\bpromo\b/i,
+];
+
+// THE ONE PREDICATE every layer must call for a shiur card.
+// Returns a refusal reason, or null when the item may appear.
+export function shiurRefuseReason(title = "", extra = "") {
+  const s = `${title} ${extra}`;
+  if (NOT_HIM.some((re) => re.test(s))) return "not-him";
+  if (NOT_A_SHIUR.some((re) => re.test(s))) return "not-a-shiur";
+  return null;
+}
+export const shiurAllowed = (title, extra) => shiurRefuseReason(title, extra) === null;
