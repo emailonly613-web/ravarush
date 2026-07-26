@@ -5,7 +5,10 @@ const { title, description, wide = false, noindex = false } = Astro.props;
 const pageTitle = title ? `${title} · Rabbi Shalom Arush` : "Rabbi Shalom Arush — The Garden of Emuna in English";
 const desc = description || IDENTITY.intro;
 // Haesh Sheli — a real fire flame (owner: no olive-leaf; the famous "my fire" symbol).
-const mark = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='f' x1='0' y1='1' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%237a1500'/%3E%3Cstop offset='.35' stop-color='%23e24800'/%3E%3Cstop offset='.7' stop-color='%23ff9a2e'/%3E%3Cstop offset='1' stop-color='%23ffe89a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M34 4c6 13-8 18 3 30 5 6 2 14-3 18 3-8-3-11-6-7-4 6 1 13 6 18-14-2-24-14-22-30 1-8 9-13 7-24-1-5 5-9 8-5z' fill='url(%23f)'/%3E%3C/svg%3E`;
+// THE REAL EMBLEM — the האש שלי flame, from the movement's own embroidered patch
+// (owner supplied it 2026-07-26: "the logo thats wrong"). What stood here before was a
+// generic orange flame I drew myself. Never invent a mosad's emblem — use theirs.
+const mark = "/img/haesh-logo.png";
 ---
 <!doctype html>
 <html lang="en">
@@ -32,7 +35,9 @@ const mark = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewB
 <meta name="twitter:title" content={pageTitle} />
 <meta name="twitter:description" content={desc} />
 <meta name="twitter:image" content={new URL("/img/arush-2.jpg", Astro.site)} />
-<link rel="icon" href={mark} />
+<link rel="icon" href="/img/favicon-32.png" sizes="32x32" />
+<link rel="icon" href="/img/icon-192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet" />

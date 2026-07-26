@@ -30,7 +30,8 @@ h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.1;margin:0}
   background:rgba(11,18,32,.72);border-bottom:1px solid var(--line);transition:background .3s}
 .hdr .in{display:flex;align-items:center;justify-content:space-between;gap:18px;height:66px}
 .brand{display:flex;align-items:center;gap:12px;font-family:var(--serif);font-size:1.28rem}
-.brand .mk{width:34px;height:34px;flex:none}
+.brand .mk{width:auto;height:34px;flex:none;object-fit:contain;
+  filter:drop-shadow(0 2px 8px rgba(120,160,255,.35))}
 .nav{display:flex;gap:26px;font-size:.95rem}
 .nav a{color:var(--muted);transition:color .2s}.nav a:hover{color:var(--gold)}
 @media(max-width:760px){.nav{display:none}}
@@ -46,7 +47,8 @@ h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.1;margin:0}
   radial-gradient(1000px 520px at 50% 40%,transparent,rgba(11,18,32,.55))}
 @media(prefers-reduced-motion:reduce){.hero-photo{animation:none}}
 @media(max-width:640px){.hero-photo{background-position:center 14%}}
-.hero-haesh{display:block;margin:0 auto 18px;width:clamp(160px,22vw,240px);height:auto;filter:drop-shadow(0 6px 24px rgba(255,120,0,.4))}
+.hero-haesh{display:block;margin:0 auto 16px;width:auto;height:clamp(112px,15vw,168px);
+  filter:drop-shadow(0 10px 30px rgba(120,160,255,.34))}
 .hero h1{font-size:clamp(2.6rem,6.4vw,5rem);letter-spacing:-.01em}
 .hero .lede{max-width:720px;margin:22px auto 0;color:var(--muted);font-size:clamp(1.02rem,1.6vw,1.2rem)}
 .hero .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px}
