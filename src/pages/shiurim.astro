@@ -10,7 +10,8 @@ const mmss = (d) => { if (!d) return ""; const h = Math.floor(d / 3600), m = Mat
 const PER = 12;
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 ---
-<Base title="Shiurim" description="The shiurim of Rabbi Shalom Arush — his own classes, gathered from his official sources and set in order room by room. Watch, listen, and download.">
+<Base title="Shiurim" description="The shiurim of Rabbi Shalom Arush — his own classes, gathered from his official sources and set in order room by room. Watch, listen, and download." dawn={true}>
+  <div class="dawn dawn--page">
   <section class="section"><div class="wrap">
     <div class="section-head rv">
       <p class="eyebrow">The Shiurim Wing</p>
@@ -109,4 +110,5 @@ const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g
 
   </script>
   <script is:inline src="/hover-play.js"></script>
+  </div>
 </Base>

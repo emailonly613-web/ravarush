@@ -16,7 +16,8 @@ const bookSchema = books.map((b) => ({
   inLanguage: "en", url: b.u, description: b.d, publisher: { "@type": "Organization", name: "Chut Shel Chessed" },
 }));
 ---
-<Base title="Sefarim" description="The books of Rabbi Shalom Arush — the Garden of Emuna, Garden of Peace, In Forest Fields and more — in English and Hebrew from the official Breslev store.">
+<Base title="Sefarim" description="The books of Rabbi Shalom Arush — the Garden of Emuna, Garden of Peace, In Forest Fields and more — in English and Hebrew from the official Breslev store." dawn={true}>
+  <div class="dawn dawn--page">
   {bookSchema.map((b) => (<script type="application/ld+json" set:html={JSON.stringify(b)} />))}
   <section class="section"><div class="wrap">
     <div class="section-head rv">
@@ -36,4 +37,5 @@ const bookSchema = books.map((b) => ({
     </div>
     <p class="muted" style="text-align:center;margin-top:30px"><a href="https://breslev.com/store/" rel="noopener" style="color:var(--gold)">See the full store on Breslev.com →</a></p>
   </div></section>
+  </div>
 </Base>

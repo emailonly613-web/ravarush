@@ -4,7 +4,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 const w = JSON.parse(readFileSync(join(process.cwd(), "public", "data", "writings-he.json"), "utf8"));
 ---
-<Base title="Hebrew Writings — כתבים בעברית" description="The Hebrew writings of Rabbi Shalom Arush — over 1,400 articles in his own words, sorted by theme, each with an option to translate to English.">
+<Base title="Hebrew Writings — כתבים בעברית" description="The Hebrew writings of Rabbi Shalom Arush — over 1,400 articles in his own words, sorted by theme, each with an option to translate to English." dawn={true}>
+  <div class="dawn dawn--page">
   <section class="section"><div class="wrap">
     <div class="section-head rv">
       <p class="eyebrow">כתבים בעברית · Hebrew Writings</p>
@@ -37,4 +38,5 @@ const w = JSON.parse(readFileSync(join(process.cwd(), "public", "data", "writing
       res.innerHTML=hits.map(a=>`<a class="row" href="/read-he/${a.i}" dir="rtl"><span class="t">${a.t}</span><span class="m">${a.r||""}</span></a>`).join("")||`<p class="muted" style="text-align:center;padding:20px">לא נמצא</p>`;
     });
   </script>
+  </div>
 </Base>

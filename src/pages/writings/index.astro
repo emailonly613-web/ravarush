@@ -4,7 +4,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 const w = JSON.parse(readFileSync(join(process.cwd(), "public", "data", "writings.json"), "utf8"));
 ---
-<Base title="Writings" description="The written Torah of Rabbi Shalom Arush, set in order by theme — over a thousand articles across ten halls.">
+<Base title="Writings" description="The written Torah of Rabbi Shalom Arush, set in order by theme — over a thousand articles across ten halls." dawn={true}>
+  <div class="dawn dawn--page">
   <section class="section"><div class="wrap">
     <div class="section-head rv">
       <p class="eyebrow">The Writings Wing</p>
@@ -39,4 +40,5 @@ const w = JSON.parse(readFileSync(join(process.cwd(), "public", "data", "writing
         || `<p class="muted" style="text-align:center;padding:20px">No writing found for “${v}”.</p>`;
     });
   </script>
+  </div>
 </Base>

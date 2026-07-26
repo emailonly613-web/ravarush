@@ -11,7 +11,8 @@ const { hall } = Astro.params;
 const H = w.halls.find((h) => h.slug === hall);
 if (!H) return Astro.redirect("/writings-he");
 ---
-<Base title={`${H.title} — Hebrew`} description={H.blurb}>
+<Base title={`${H.title} — Hebrew`} description={H.blurb} dawn={true}>
+  <div class="dawn dawn--page">
   <section class="section"><div class="wrap">
     <p class="crumbs"><a href="/writings-he">Hebrew Writings</a> › {H.title}</p>
     <div class="section-head rv" style="text-align:left;margin-left:0">
@@ -33,4 +34,5 @@ if (!H) return Astro.redirect("/writings-he");
     const q=document.getElementById("q"),rows=[...document.querySelectorAll("#rows .row")];
     q.addEventListener("input",()=>{const v=q.value.trim();rows.forEach(r=>r.style.display=(!v||r.dataset.t.includes(v))?"":"none")});
   </script>
+  </div>
 </Base>

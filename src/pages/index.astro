@@ -65,14 +65,14 @@ const wings = [
       <div class="mq-wrap">
         <div class="mq">
           {[...stills.slice(0, half), ...stills.slice(0, half)].map((v) => (
-            <button class="mq-it" data-play={v.id} aria-label={v.title}><img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" /></button>
+            <button class="mq-it" data-play={v.id} aria-label={v.title} title={v.title}><img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" />{v.dur > 0 && <span class="mq-dur">{mmss(v.dur)}</span>}<span class="mq-cap">{v.title}</span></button>
           ))}
         </div>
       </div>
       <div class="mq-wrap">
         <div class="mq rev">
           {[...stills.slice(half), ...stills.slice(half)].map((v) => (
-            <button class="mq-it" data-play={v.id} aria-label={v.title}><img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" /></button>
+            <button class="mq-it" data-play={v.id} aria-label={v.title} title={v.title}><img src={`${CDN}/thumb/${v.id}.jpg`} alt="" loading="lazy" />{v.dur > 0 && <span class="mq-dur">{mmss(v.dur)}</span>}<span class="mq-cap">{v.title}</span></button>
           ))}
         </div>
       </div>
